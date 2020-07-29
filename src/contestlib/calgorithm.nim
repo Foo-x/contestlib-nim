@@ -1,3 +1,5 @@
+import algorithm, sequtils
+
 proc minMatch*(left, right: int, pred: proc(x: int): bool): int =
   ## `left`以上`right`以下の整数のうち、`pred`を満たす最小の値を返します。
   ## `pred`を満たす値が存在しない場合は`right + 1`を返します。
@@ -41,3 +43,9 @@ proc maxMatch*(left, right: int, pred: proc(x: int): bool): int =
       ng = mid
 
   ok
+
+iterator permutations*[T](a: var openArray[T]): seq[T] =
+  var v = a.toSeq
+  yield v
+  while v.nextPermutation():
+    yield v
