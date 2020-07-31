@@ -1,10 +1,13 @@
-import sequtils, options, strformat
+import sequtils, options, strformat, algorithm, sugar
 
 type
   TreeNode* = ref object
     id*: Natural
     parent*: Option[TreeNode]
     children*: seq[TreeNode]
+
+  WalkOrder* = enum
+    Pre, In, Post, Level, Id
 
 proc newNode*(id: Natural, parent: Option[TreeNode], children: openArray[TreeNode]): TreeNode =
   TreeNode(id: id, parent: parent, children: children.toSeq)
@@ -87,6 +90,55 @@ proc findById*(node: TreeNode, id: Natural): Option[TreeNode] =
       return resultOption
 
   return TreeNode.none
+
+proc isBinaryTree*(node: TreeNode): bool =
+  var stack = @[node.root]
+  while stack.len != 0:
+    var cur = stack.pop()
+    if cur.children.len > 2:
+      return false
+
+    if cur.children.len != 0:
+      stack.add cur.children
+
+  return true
+
+proc flatInternal(node: TreeNode, order: WalkOrder): seq[TreeNode] =
+  case order:
+  of Pre:
+    result.add node
+    result.add node.children.mapIt(flatInternal(it, order)).concat
+
+  of Post:
+    result.add node.children.mapIt(flatInternal(it, order)).concat
+    result.add node
+
+  of In:
+    if not node.isBinaryTree:
+      return
+
+    if node.children.len > 0:
+      result.add flatInternal(node.children[0], order)
+
+    result.add node
+
+    if node.children.len > 1:
+      result.add flatInternal(node.children[1], order)
+
+  of Level:
+    var queue = @[node]
+    while queue.len > 0:
+      let cur = queue.pop()
+      result.add cur
+      queue.insert(cur.children.reversed, 0)
+
+  of Id:
+    result = flatInternal(node, Pre).sorted((x, y) => x.id > y.id)
+
+proc flat*(node: TreeNode, order: WalkOrder = Pre): seq[TreeNode] =
+  ## nodeにつながっている全ノードを指定された順で返します。
+  ## 二分木以外に対して中間順（通りがけ順）を指定した場合は空リストを返します。
+  flatInternal(node.root, order)
 
 proc `$`*(node: TreeNode): string =
   &"TreeNode@id={node.id},children={node.children}"
