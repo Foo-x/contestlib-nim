@@ -39,12 +39,37 @@ proc fromParentList*(parentList: openArray[int]): TreeNode =
 
   nodes.filterIt(it.parent.isNone)[0]
 
+proc isRoot*(node: TreeNode): bool =
+  node.parent.isNone
+
+proc isLeaf*(node: TreeNode): bool =
+  node.children.len == 0
+
+proc isInternal*(node: TreeNode): bool =
+  not (node.isRoot or node.isLeaf)
+
+proc root*(node: TreeNode): TreeNode =
+  result = node
+  while not result.isRoot:
+    result = result.parent.get
+
+proc siblings*(node: TreeNode): seq[TreeNode] =
+  if node.isRoot:
+    return @[]
+
+  result = node.parent.get.children.filterIt(it != node)
+
 proc depth*(node: TreeNode): int =
-  var parent = node.parent
-  if parent.isSome:
-    result = parent.get.depth + 1
-  else:
+  if node.isRoot:
     result = 0
+  else:
+    result = node.parent.get.depth + 1
+
+proc height*(node: TreeNode): int =
+  if node.isLeaf:
+    return 0
+  else:
+    return max(node.children.mapIt(it.height)) + 1
 
 proc removeChild*(node: TreeNode, child: TreeNode) =
   let index = node.children.find(child)
