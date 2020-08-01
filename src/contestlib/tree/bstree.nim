@@ -1,7 +1,7 @@
 ## 二分探索木
 ## 右同値
 
-import options, sugar, strformat
+import options, sugar, strformat, sequtils
 
 type
   BSTree* = ref object
@@ -74,6 +74,18 @@ proc insert*(tree: BSTree, child: BSTree) =
 
 proc insert*(tree: BSTree, value: int) =
   insert(tree, newBSTree(value))
+
+proc findByValue*(tree: BSTree, value: int): Option[BSTree] =
+  ## 子孫からvalueでDFS（深さ優先探索）します。
+  for child in [tree.left, tree.right].filterIt(it.isSome).mapIt(it.get):
+    if child.value == value:
+      return child.some
+
+    let resultOption = findByValue(child, value)
+    if resultOption.isSome:
+      return resultOption
+
+  return BSTree.none
 
 proc flatInternal(tree: BSTree, order: WalkOrder): seq[BSTree] =
   case order:
