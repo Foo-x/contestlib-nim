@@ -9,14 +9,11 @@ type
   WalkOrder* = enum
     Pre, In, Post, Level, Id
 
-proc newNode*(id: Natural, parent: Option[TreeNode], children: openArray[TreeNode]): TreeNode =
-  TreeNode(id: id, parent: parent, children: children.toSeq)
-
-proc newNode*(id: Natural, parent: TreeNode, children: openArray[TreeNode]): TreeNode =
-  newNode(id, parent.some, children)
-
 proc newNode*(id: Natural, children: openArray[TreeNode]): TreeNode =
-  newNode(id, TreeNode.none, children)
+  TreeNode(id: id, parent: TreeNode.none, children: children.toSeq)
+
+proc newNode*(id: Natural): TreeNode =
+  newNode(id, @[])
 
 proc addChild*(node: TreeNode, child: TreeNode) =
   child.parent = node.some
