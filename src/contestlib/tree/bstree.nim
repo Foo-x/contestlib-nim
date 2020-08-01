@@ -71,10 +71,12 @@ proc insert*(tree: BSTree, child: BSTree) =
     let isNextLeft = child.value < target.value
     if isNextLeft and target.left.isNone:
       target.left = child.some
+      child.parent = target.some
       break
 
     if not isNextLeft and target.right.isNone:
       target.right = child.some
+      child.parent = target.some
       break
 
     if isNextLeft:
