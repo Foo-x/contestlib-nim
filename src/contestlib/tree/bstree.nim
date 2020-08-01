@@ -102,6 +102,81 @@ proc findByValue*(tree: BSTree, value: int): Option[BSTree] =
 
   return BSTree.none
 
+proc remove*(tree: var BSTree, value: int) =
+  ## ノードを削除します。
+  ## 対象のノードが複数ある場合は最も浅いものを削除します。
+  ## 木が1ノードからなる場合はそのまま返します。
+  let root = tree.root
+  if root.left.isNone and root.right.isNone:
+    return
+
+  # 削除するノードが根の場合
+  if value == root.value:
+    if root.right.isNone:
+      tree = root.left.get
+      tree.parent = BSTree.none
+      return
+
+    if root.left.isNone:
+      tree = root.right.get
+      tree.parent = BSTree.none
+      return
+
+    tree = root.right.get.min
+    if root.right.get != tree:
+      tree.parent.get.left = tree.right
+      tree.right = root.right
+      tree.right.get.parent = tree.some
+    else:
+      tree.right = BSTree.none
+
+    tree.parent = BSTree.none
+    tree.left = root.left
+    tree.left.get.parent = tree.some
+    return
+
+  let target = root.findByValue(value)
+  if target.isNone:
+    return
+
+  let
+    targetContent = target.get
+  var
+    newChild: Option[BSTree]
+
+  if targetContent.left.isNone and targetContent.right.isNone:
+    newChild = BSTree.none
+  elif targetContent.left.isSome and targetContent.right.isNone:
+    newChild = targetContent.left
+  elif targetContent.left.isNone and targetContent.right.isSome:
+    newChild = targetContent.right
+  else:
+    newChild = targetContent.right.get.min.some
+
+    if targetContent.right != newChild:
+      newChild.get.parent.get.left = newChild.get.right
+      newChild.get.right = targetContent.right
+      newChild.get.right.get.parent = newChild
+    else:
+      newChild.get.right = BSTree.none
+
+    newChild.get.left = targetContent.left
+    newChild.get.left.get.parent = newChild
+
+  if newChild.isSome:
+    newChild.get.parent = targetContent.parent
+
+  if targetContent.parent.get.left == target:
+    targetContent.parent.get.left = newChild
+  else:
+    targetContent.parent.get.right = newChild
+
+proc remove*(tree: var BSTree, child: BSTree) =
+  ## ノードを削除します。
+  ## 対象のノードが複数ある場合は最も浅いものを削除します。
+  ## 木が1ノードからなる場合はそのまま返します。
+  remove(tree, child.value)
+
 proc flatInternal(tree: BSTree, order: WalkOrder): seq[BSTree] =
   case order:
   of Pre:
