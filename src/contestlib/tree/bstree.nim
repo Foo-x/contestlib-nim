@@ -88,7 +88,10 @@ proc insert*(tree: BSTree, value: int) =
   insert(tree, newBSTree(value))
 
 proc findByValue*(tree: BSTree, value: int): Option[BSTree] =
-  ## 子孫からvalueでDFS（深さ優先探索）します。
+  ## 木から深さ優先探索をします。
+  if tree.value == value:
+    return tree.some
+
   for child in [tree.left, tree.right].filterIt(it.isSome).mapIt(it.get):
     if child.value == value:
       return child.some
