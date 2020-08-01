@@ -13,7 +13,8 @@ type
   WalkOrder* = enum
     Pre, In, Post, Level
 
-proc newBSTree*(value: int, left: Option[BSTree], right: Option[BSTree]): BSTree =
+proc newBSTree*(value: int, left: Option[BSTree], right: Option[
+    BSTree]): BSTree =
   BSTree(value: value, parent: BSTree.none, left: left, right: right)
 
 proc newBSTree*(value: int): BSTree =
@@ -33,7 +34,7 @@ proc root*(tree: BSTree): BSTree =
   while not result.isRoot:
     result = result.parent.get
 
-proc sibling*(tree: BSTree):Option[BSTree] =
+proc sibling*(tree: BSTree): Option[BSTree] =
   if tree.isRoot:
     return BSTree.none
 
@@ -53,7 +54,8 @@ proc height*(tree: BSTree): int =
   if tree.isLeaf:
     return 0
   else:
-    return max(tree.left.map(x => x.depth).get(0), tree.right.map(x => x.depth).get(0)) + 1
+    return max(tree.left.map(x => x.depth).get(0), tree.right.map(x =>
+        x.depth).get(0)) + 1
 
 proc max*(tree: BStree): BSTree =
   result = tree
@@ -88,19 +90,17 @@ proc insert*(tree: BSTree, value: int) =
   insert(tree, newBSTree(value))
 
 proc findByValue*(tree: BSTree, value: int): Option[BSTree] =
-  ## 木から深さ優先探索をします。
+  ## 木から二分探索をします。
   if tree.value == value:
     return tree.some
 
-  for child in [tree.left, tree.right].filterIt(it.isSome).mapIt(it.get):
-    if child.value == value:
-      return child.some
+  let child =
+    if value < tree.value:
+      tree.left
+    else:
+      tree.right
 
-    let resultOption = findByValue(child, value)
-    if resultOption.isSome:
-      return resultOption
-
-  return BSTree.none
+  return child.flatMap((x: BSTree) => findByValue(x, value))
 
 proc remove*(tree: var BSTree, value: int) =
   ## ノードを削除します。
