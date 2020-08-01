@@ -55,6 +55,16 @@ proc height*(tree: BSTree): int =
   else:
     return max(tree.left.map(x => x.depth).get(0), tree.right.map(x => x.depth).get(0)) + 1
 
+proc max*(tree: BStree): BSTree =
+  result = tree
+  while result.right.isSome:
+    result = result.right.get
+
+proc min*(tree: BStree): BSTree =
+  result = tree
+  while result.left.isSome:
+    result = result.left.get
+
 proc insert*(tree: BSTree, child: BSTree) =
   var target = tree.root
   while true:
