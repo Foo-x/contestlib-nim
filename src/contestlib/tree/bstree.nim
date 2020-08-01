@@ -1,7 +1,7 @@
 ## 二分探索木
 ## 右同値
 
-import options, sugar, strformat, sequtils
+import options, sugar, strformat
 
 type
   BSTree* = ref object
@@ -54,8 +54,8 @@ proc height*(tree: BSTree): int =
   if tree.isLeaf:
     return 0
   else:
-    return max(tree.left.map(x => x.depth).get(0), tree.right.map(x =>
-        x.depth).get(0)) + 1
+    return max(tree.left.map(x => x.height).get(0), tree.right.map(x =>
+        x.height).get(0)) + 1
 
 proc max*(tree: BStree): BSTree =
   result = tree
