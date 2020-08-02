@@ -102,76 +102,69 @@ proc findByValue*(tree: BSTree, value: int): Option[BSTree] =
 
   return child.flatMap((x: BSTree) => findByValue(x, value))
 
-proc remove*(tree: var BSTree, value: int) =
+proc replaceWithChild(parentTree: BSTree, childTree: Option[BSTree]) =
+  ## 1つ以下の子を持つparentTreeをその子で置き換えます。
+  ## parentTreeが根でchildTreeがnoneの場合は何もしません。
+  if parentTree.left.isSome and parentTree.right.isSome:
+    return
+  if parentTree.left != childTree and parentTree.right != childTree:
+    return
+  if parentTree.root == parentTree and childTree.isNone:
+    return
+
+  if parentTree.root == parentTree:
+    parentTree.value = childTree.get.value
+
+    parentTree.left = childTree.get.left
+    if parentTree.left.isSome:
+      parentTree.left.get.parent = parentTree.some
+
+    parentTree.right = childTree.get.right
+    if parentTree.right.isSome:
+      parentTree.right.get.parent = parentTree.some
+    return
+
+  let gparent = parentTree.parent
+
+  if childTree.isSome:
+    childTree.get.parent = gparent
+
+  if gparent.get.left == parentTree.some:
+    gparent.get.left = childTree
+  else:
+    gparent.get.right = childTree
+
+proc replaceWithLeft(tree: BSTree) =
+  ## 自身を左の子で置き換えます。
+  ## 自身が根で左の子が存在しない場合は何もしません。
+  replaceWithChild(tree, tree.left)
+
+proc replaceWithRight(tree: BSTree) =
+  ## 自身を右の子で置き換えます。
+  ## 自身が根で右の子が存在しない場合は何もしません。
+  replaceWithChild(tree, tree.right)
+
+proc remove*(tree: BSTree, value: int) =
   ## ノードを削除します。
   ## 対象のノードが複数ある場合は最も浅いものを削除します。
   ## 木が1ノードからなる場合はそのまま返します。
-  let root = tree.root
-  if root.left.isNone and root.right.isNone:
-    return
-
-  # 削除するノードが根の場合
-  if value == root.value:
-    if root.right.isNone:
-      tree = root.left.get
-      tree.parent = BSTree.none
-      return
-
-    if root.left.isNone:
-      tree = root.right.get
-      tree.parent = BSTree.none
-      return
-
-    tree = root.right.get.min
-    if root.right.get != tree:
-      tree.parent.get.left = tree.right
-      tree.right = root.right
-      tree.right.get.parent = tree.some
-    else:
-      tree.right = BSTree.none
-
-    tree.parent = BSTree.none
-    tree.left = root.left
-    tree.left.get.parent = tree.some
-    return
-
-  let target = root.findByValue(value)
+  let
+    root = tree.root
+    target = root.findByValue(value)
   if target.isNone:
     return
 
-  let
-    targetContent = target.get
-  var
-    newChild: Option[BSTree]
-
-  if targetContent.left.isNone and targetContent.right.isNone:
-    newChild = BSTree.none
-  elif targetContent.left.isSome and targetContent.right.isNone:
-    newChild = targetContent.left
-  elif targetContent.left.isNone and targetContent.right.isSome:
-    newChild = targetContent.right
+  let targetContent = target.get
+  if targetContent.left.isNone:
+    targetContent.replaceWithRight
+  elif targetContent.right.isNone:
+    targetContent.replaceWithLeft
   else:
-    newChild = targetContent.right.get.min.some
+    let newTree = targetContent.right.get.min
+    targetContent.value = newTree.value
+    newTree.replaceWithRight
 
-    if targetContent.right != newChild:
-      newChild.get.parent.get.left = newChild.get.right
-      newChild.get.right = targetContent.right
-      newChild.get.right.get.parent = newChild
-    else:
-      newChild.get.right = BSTree.none
-
-    newChild.get.left = targetContent.left
-    newChild.get.left.get.parent = newChild
-
-  if newChild.isSome:
-    newChild.get.parent = targetContent.parent
-
-  if targetContent.parent.get.left == target:
-    targetContent.parent.get.left = newChild
-  else:
-    targetContent.parent.get.right = newChild
-
-proc remove*(tree: var BSTree, child: BSTree) =
+proc remove*(tree: BSTree, child: BSTree) =
   ## ノードを削除します。
   ## 対象のノードが複数ある場合は最も浅いものを削除します。
   ## 木が1ノードからなる場合はそのまま返します。
