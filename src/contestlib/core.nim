@@ -1,6 +1,9 @@
+import math
+
 const
-  InfInt* = int.high
-  NegInfInt* = int.low
+  InfInt* = 10^12
+  NegInfInt* = -10^12
+  MOD* = 10^9 + 7
 
 template loop*(n: int, body) = (for _ in 0..<n: body)
 template `max=`*(x, y) = x = max(x, y)
