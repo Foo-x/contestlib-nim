@@ -11,6 +11,7 @@ let readNext = iterator(getsChar: bool = false): string {.closure.} =
 proc read*(t: typedesc[string]): string = readNext()
 proc read*(t: typedesc[char]): char = readNext(true)[0]
 proc read*(t: typedesc[int]): int = readNext().parseInt
+proc read*(t: typedesc[float]): float = readNext().parseFloat
 
 macro read*(t: typedesc, n: varargs[int]): untyped =
   var repStr = ""
