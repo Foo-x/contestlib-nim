@@ -1,8 +1,8 @@
 import math
 
 const
-  InfInt* = 10^12
-  NegInfInt* = -10^12
+  InfInt* = 10^18
+  NegInfInt* = -10^18
   MOD* = 10^9 + 7
 
 template loop*(n: int, body) = (for _ in 0..<n: body)
