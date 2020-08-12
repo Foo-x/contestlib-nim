@@ -58,16 +58,17 @@ proc `*`*[T](a, b: Matrix[T]): Matrix[T] =
 
 proc `^`*[T](m: Matrix[T], n: Positive): Matrix[T] =
   assert m.r == m.c
-  ## TODO: inverse
-  if n <= 0:
-    return identityMatrix[T](m.r)
-  if n == 1:
-    return m
 
-  let m2 = m^(n div 2)
-  if n mod 2 == 0:
-    return m2 * m2
-  return m2 * m2 * m
+  var
+    m = m
+    n: int = n
+  result = identityMatrix[T](m.r)
+
+  while n > 0:
+    if n mod 2 == 1:
+      result = m * result
+    m = m * m
+    n = n shr 1
 
 proc `*`*[T](a: Matrix, b: openArray[T]): seq[T] =
   assert a.c == b.len
