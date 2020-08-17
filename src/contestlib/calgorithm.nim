@@ -78,3 +78,13 @@ proc findLastIf*[T](a: openArray[T], pred: proc (x: T): bool): int =
       return i
 
   return -1
+
+proc deduplicated*[T](a: openArray[T]): seq[T] =
+  ## 重複を排除します。
+  ## O(NlogN)
+  ## 標準ライブラリのdeduplicateはソートされていないとO(N^2)
+  result = @[]
+  for x in a.sorted:
+    if result.len > 0 and result[^1] == x:
+      continue
+    result.add x
