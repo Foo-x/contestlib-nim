@@ -4,7 +4,7 @@ const
   InfInt = 1e18.int
 
 type
-  Edge* = tuple[node, cost: int]
+  Edge* = tuple[dst, cost: int]
 
 proc `<`(a, b: Edge): bool = a.cost < b.cost
 
@@ -25,10 +25,10 @@ proc dijkstra*(G: seq[seq[Edge]], start: int): seq[int] =
     result[src] = cost
 
     for edge in G[src]:
-      if result[edge.node] != -1:
+      if result[edge.dst] != -1:
         continue
 
-      queue.push((edge.node, cost + edge.cost))
+      queue.push((edge.dst, cost + edge.cost))
 
 proc bfs*(G: seq[seq[int]], start: int): seq[int] =
   ## 重みなしグラフの`start`から各ノードへの最短距離を返します。
@@ -70,18 +70,18 @@ proc spfa*(G: seq[seq[Edge]], start: int): seq[int] =
     inQueue[src] = false
 
     for edge in G[src]:
-      if result[src] + edge.cost >= result[edge.node]:
+      if result[src] + edge.cost >= result[edge.dst]:
         continue
 
-      result[edge.node] = result[src] + edge.cost
-      if inQueue[edge.node]:
+      result[edge.dst] = result[src] + edge.cost
+      if inQueue[edge.dst]:
         continue
-      if counts[edge.node] >= G.len:
+      if counts[edge.dst] >= G.len:
         return @[]
 
-      counts[edge.node] += 1
-      inQueue[edge.node] = true
-      queue.insert(edge.node, 0)
+      counts[edge.dst] += 1
+      inQueue[edge.dst] = true
+      queue.insert(edge.dst, 0)
 
 proc warshallFroyd*(G: seq[seq[int]]): seq[seq[int]] =
   ## 負数を含む重み付きグラフの全ノード間の最短距離を返します。
