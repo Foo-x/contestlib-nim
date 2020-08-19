@@ -1,4 +1,4 @@
-import math, sequtils, random
+import math, sequtils, random, tables
 from ./modint import modpow
 
 randomize()
@@ -70,3 +70,16 @@ proc getPrimes*(n: Positive): seq[int] =
   for i, p in primesTable:
     if p:
       result.add i
+
+proc primeFactorize*(n: Positive): CountTable[int] =
+  if n == 1:
+    return
+
+  var n = n
+  for i in 2..n.toFloat.sqrt.toInt:
+    while n mod i == 0:
+      n = n div i
+      result.inc(i)
+
+  if n != 1:
+    result.inc(n)
