@@ -18,3 +18,28 @@ macro read*(t: typedesc, n: varargs[int]): untyped =
   for arg in n:
     repStr &= &"({arg.repr}).newSeqWith "
   parseExpr(&"{repStr}read({t})")
+
+macro read*(ts: varargs[auto]): untyped =
+  var tupStr = ""
+  for t in ts:
+    tupStr &= &"read({t.repr}),"
+  parseExpr(&"({tupStr})")
+
+macro read*(n: int, ts: varargs[auto]): untyped =
+  var
+    idents = newStmtList()
+    asgns = newStmtList()
+    tupStr = ""
+  let index = ident("i")
+  for j, typ in ts:
+    idents.add parseExpr(&"var v{j} = newSeq[{typ}]({n.repr})")
+    asgns.add parseExpr(&"v{j}[{index}] = read({typ})")
+    tupStr &= &"v{j},"
+  let tup = parseExpr(&"({tupStr})")
+
+  result = quote do:
+    block:
+      `idents`
+      for `index` in 0..<`n`:
+        `asgns`
+      `tup`
