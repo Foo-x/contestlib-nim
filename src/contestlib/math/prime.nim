@@ -13,7 +13,7 @@ proc isPrime*(n: Positive): bool =
   if n mod 2 == 0:
     return false
 
-  for i in countup(3, n.toFloat.sqrt.toInt, 2):
+  for i in countup(3, n.toFloat.sqrt.int, 2):
     if n mod i == 0:
       return false
 
@@ -56,7 +56,7 @@ proc getPrimesTable*(n: Positive): seq[bool] =
   result = newSeqWith(n+1, true)
   result[0] = false
   result[1] = false
-  for i in 2..n.toFloat.sqrt.toInt:
+  for i in 2..n.toFloat.sqrt.int:
     if not result[i]:
       continue
     for j in countup(i*2, n, i):
@@ -76,7 +76,7 @@ proc primeFactorize*(n: Positive): CountTable[int] =
     return
 
   var n = n
-  for i in 2..n.toFloat.sqrt.toInt:
+  for i in 2..n.toFloat.sqrt.int:
     while n mod i == 0:
       n = n div i
       result.inc(i)
