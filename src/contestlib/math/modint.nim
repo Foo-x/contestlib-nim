@@ -1,5 +1,5 @@
 type
-  ModInt = object
+  ModInt* = object
     v*: Natural # 0..<m
     m*: Positive
 
