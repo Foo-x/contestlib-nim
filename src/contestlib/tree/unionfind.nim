@@ -3,14 +3,13 @@ type
     ## 各クエリはO(α(N))
     ## α(N)はアッカーマン関数の逆関数でほぼ定数
 
-
 proc newUnionFind*(size: int): UnionFind =
   result = newSeqUninitialized[int](size)
   for i in 0..<size:
-    result[i] = i
+    result[i] = -1
 
 proc root*(uf: var UnionFind, x: int): int =
-  if uf[x] == x:
+  if uf[x] < 0:
     return x
 
   uf[x] = uf.root(uf[x])
@@ -29,14 +28,10 @@ proc merge*(uf: var UnionFind, x, y: int): bool {.discardable.} =
 
   if uf[ry] < uf[rx]:
     swap rx, ry
-  if uf[rx] == uf[ry]:
-    uf[rx] -= 1
+  uf[rx] += uf[ry]
   uf[ry] = rx
 
   return true
 
 proc count*(uf: var UnionFind, x: int): int =
-  let root = uf.root(x)
-  for p in uf:
-    if uf.root(p) == root:
-      result += 1
+  -uf[uf.root(x)]
