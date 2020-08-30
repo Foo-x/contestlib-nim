@@ -11,3 +11,8 @@ template `min=`*(x, y) = x = min(x, y)
 template `mod=`*(x, y) = x = x mod y
 template `sumMod=`*(x, y, m = MOD) = x = (x + y) mod m
 template `prodMod=`*(x, y, m = MOD) = x = (x * y) mod m
+template doWhile*(cond, body: untyped): untyped =
+  while true:
+    body
+    if not cond:
+      break
