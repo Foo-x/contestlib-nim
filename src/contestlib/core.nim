@@ -1,4 +1,4 @@
-import math
+import std/math
 
 const
   InfInt* = 1e18.int

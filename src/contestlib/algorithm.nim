@@ -1,4 +1,4 @@
-import algorithm, sequtils
+import std/algorithm, sequtils
 
 proc minMatch*(left, right: int, pred: proc(x: int): bool): int =
   ## `left`以上`right`以下の整数のうち、`pred`を満たす最小の値を返します。

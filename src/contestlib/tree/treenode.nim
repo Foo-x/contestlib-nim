@@ -1,4 +1,4 @@
-import sequtils, options, strformat, algorithm, sugar
+import sequtils, options, strformat, std/algorithm, sugar
 
 type
   TreeNode* = ref object

@@ -1,4 +1,4 @@
-import math, sequtils, random, tables
+import std/math, sequtils, random, tables
 from ./modint import modpow
 
 randomize()

@@ -1,4 +1,4 @@
-import algorithm, sequtils, bitops
+import std/algorithm, sequtils, bitops
 
 proc bitLen(t: typedesc): int =
   sizeof(t) * 8 - 1

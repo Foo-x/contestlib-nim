@@ -1,5 +1,5 @@
 import tree/[bit, unionfind]
-import algorithm
+import std/algorithm
 
 proc invCount*[T](s: openArray[T]): int =
   ## `s`の最大値を長さとするBITを使用し、転倒数を計算して返します。

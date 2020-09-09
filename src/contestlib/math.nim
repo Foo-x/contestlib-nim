@@ -1,4 +1,4 @@
-import math
+import std/math
 
 proc isSquare*(n: Positive): bool =
   n.float.sqrt.int^2 == n
