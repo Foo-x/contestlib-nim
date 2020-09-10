@@ -52,7 +52,7 @@ proc isProbablyPrime(n: Positive): bool =
 
 proc getPrimesTable*(n: Positive): seq[bool] =
   ## n以下の素数表を返します。
-  ## エラトステネスの篩: O(Nlog^2(N))
+  ## エラトステネスの篩: O(Nloglog(N))
   result = newSeqWith(n+1, true)
   result[0] = false
   result[1] = false
@@ -64,7 +64,7 @@ proc getPrimesTable*(n: Positive): seq[bool] =
 
 proc getPrimes*(n: Positive): seq[int] =
   ## n以下の素数リストを返します。
-  ## エラトステネスの篩: O(Nlog^2(N))
+  ## エラトステネスの篩: O(Nloglog(N))
   let primesTable = getPrimesTable(n)
   result = @[]
   for i, p in primesTable:
