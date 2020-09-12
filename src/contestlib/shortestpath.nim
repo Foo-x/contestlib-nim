@@ -1,4 +1,4 @@
-import heapqueue, sequtils
+import heapqueue, sequtils, deques
 
 const
   InfInt = 1e18.int
@@ -56,17 +56,17 @@ proc spfa*(G: seq[seq[Edge]], start: int): seq[int] =
   ## Shortest Path Faster Algorithm(改良版ベルマンフォード法): O(EV)
   result = newSeqWith(G.len, InfInt)
   var
-    queue = newSeq[int]()
+    queue = initDeque[int]()
     inQueue = newSeq[bool](G.len)
     counts = newSeq[int](G.len)
 
-  queue.insert(start, 0)
+  queue.addLast(start)
   result[start] = 0
   inQueue[start] = true
   counts[start] = 1
 
   while queue.len > 0:
-    let src = queue.pop()
+    let src = queue.popFirst()
     inQueue[src] = false
 
     for edge in G[src]:
@@ -81,7 +81,7 @@ proc spfa*(G: seq[seq[Edge]], start: int): seq[int] =
 
       counts[edge.dst] += 1
       inQueue[edge.dst] = true
-      queue.insert(edge.dst, 0)
+      queue.addLast(edge.dst)
 
 proc warshallFroyd*(G: seq[seq[int]]): seq[seq[int]] =
   ## 負数を含む重み付きグラフの全ノード間の最短距離を返します。

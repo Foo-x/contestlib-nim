@@ -1,6 +1,6 @@
 ## Treap
 
-import options, sugar, strformat
+import options, sugar, strformat, deques
 
 type
   Treap* = ref object
@@ -154,14 +154,15 @@ proc flatInternal(treap: Treap, order: WalkOrder): seq[Treap] =
       result.add flatInternal(treap.right.get, order)
 
   of Level:
-    var queue = @[treap]
+    var queue = initDeque[Treap]()
+    queue.addLast(treap)
     while queue.len > 0:
-      let cur = queue.pop()
+      let cur = queue.popFirst()
       result.add cur
       if cur.left.isSome:
-        queue.insert(cur.left.get, 0)
+        queue.addLast(cur.left.get)
       if cur.right.isSome:
-        queue.insert(cur.right.get, 0)
+        queue.addLast(cur.right.get)
 
 proc flat*(treap: Treap, order: WalkOrder = Pre): seq[Treap] =
   ## treapにつながっている全ノードを指定された順で返します。

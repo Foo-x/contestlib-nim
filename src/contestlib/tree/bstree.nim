@@ -1,7 +1,7 @@
 ## 二分探索木
 ## 右同値
 
-import options, sugar, strformat
+import options, sugar, strformat, deques
 
 type
   BSTree* = ref object
@@ -196,14 +196,15 @@ proc flatInternal(tree: BSTree, order: WalkOrder): seq[BSTree] =
       result.add flatInternal(tree.right.get, order)
 
   of Level:
-    var queue = @[tree]
+    var queue = initDeque[BSTree]()
+    queue.addLast(tree)
     while queue.len > 0:
-      let cur = queue.pop()
+      let cur = queue.popFirst()
       result.add cur
       if cur.left.isSome:
-        queue.insert(cur.left.get, 0)
+        queue.addLast(cur.left.get)
       if cur.right.isSome:
-        queue.insert(cur.right.get, 0)
+        queue.addLast(cur.right.get)
 
 proc flat*(tree: BSTree, order: WalkOrder = Pre): seq[BSTree] =
   ## treeにつながっている全ノードを指定された順で返します。

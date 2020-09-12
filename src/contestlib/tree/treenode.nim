@@ -1,4 +1,4 @@
-import sequtils, options, strformat, std/algorithm, sugar
+import sequtils, options, strformat, std/algorithm, sugar, deques
 
 type
   TreeNode* = ref object
@@ -123,11 +123,13 @@ proc flatInternal(node: TreeNode, order: WalkOrder): seq[TreeNode] =
       result.add flatInternal(node.children[1], order)
 
   of Level:
-    var queue = @[node]
+    var queue = initDeque[TreeNode]()
+    queue.addLast(node)
     while queue.len > 0:
-      let cur = queue.pop()
+      let cur = queue.popFirst()
       result.add cur
-      queue.insert(cur.children.reversed, 0)
+      for child in cur.children:
+        queue.addLast(child)
 
   of Id:
     result = flatInternal(node, Pre).sorted((x, y) => x.id > y.id)

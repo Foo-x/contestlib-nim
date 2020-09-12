@@ -43,8 +43,10 @@ proc toBinSeq*(a: BitSet, maxLen: range[0..bitLen(int)+1] = 0): seq[int] =
   if maxLen == 0:
     var i = 0
     while 1 shl i <= a:
-      result.insert(if a.testBit i: 1 else: 0, 0)
+      result.add(if a.testBit i: 1 else: 0)
       i += 1
+
+    result.reverse()
 
   else:
     result = newSeq[int](maxLen)
