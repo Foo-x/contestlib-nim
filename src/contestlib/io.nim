@@ -26,20 +26,7 @@ macro read*(ts: varargs[auto]): untyped =
   parseExpr(&"({tupStr})")
 
 macro read*(n: int, ts: varargs[auto]): untyped =
-  var
-    idents = newStmtList()
-    asgns = newStmtList()
-    tupStr = ""
-  let index = ident("i")
-  for j, typ in ts:
-    idents.add parseExpr(&"var v{j} = newSeq[{typ}]({n.repr})")
-    asgns.add parseExpr(&"v{j}[{index}] = read({typ})")
-    tupStr &= &"v{j},"
-  let tup = parseExpr(&"({tupStr})")
-
-  result = quote do:
-    block:
-      `idents`
-      for `index` in 0..<`n`:
-        `asgns`
-      `tup`
+  for typ in ts:
+    if typ.typeKind != ntyAnything:
+      error("Expected typedesc, got " & typ.repr, typ)
+  parseExpr(&"({n.repr}).newSeqWith read({ts.repr})")
