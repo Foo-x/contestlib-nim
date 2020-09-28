@@ -19,6 +19,14 @@ proc column*[T](m: Matrix[T], c: Natural): seq[T] =
   let p = c * m.r
   m.data[p..<m.r+p]
 
+proc swapRow*[T](m: var Matrix[T], r1, r2: Natural) =
+  for c in 0..<m.c:
+    swap m.data[r1 + c * m.r], m.data[r2 + c * m.r]
+
+proc swapColumn*[T](m: var Matrix[T], c1, c2: Natural) =
+  for r in 0..<m.r:
+    swap m.data[r + c1 * m.r], m.data[r + c2 * m.r]
+
 proc newMatrix*[T](r, c: Positive): Matrix[T] =
   new(result)
   result.r = r
@@ -91,6 +99,70 @@ proc transpose*[T](a: Matrix[T]): Matrix[T] =
   for r in 0..<a.r:
     for c in 0..<a.c:
       result[r, c] = a[c, r]
+
+proc gaussJordan(a: var Matrix[float], isExtended: bool = true): int =
+  let
+    lastColumn = if isExtended: a.c-1 else: a.c
+    eps = 1e-10
+
+  for c in 0..<lastColumn:
+    # search pivot
+    var
+      pivot = -1
+      max = eps
+
+    for r in result..<a.r:
+      if abs(a[r, c]) > max:
+        max = abs(a[r, c])
+        pivot = r
+
+    if pivot == -1:
+      continue
+
+    swapRow(a, pivot, result)
+
+    let fac = a[result, c]
+    for c2 in 0..<a.c:
+      a[result, c2] = a[result, c2] / fac
+
+    # reduction
+    for r in 0..<a.r:
+      if r != result and abs(a[r, c]) > eps:
+        let fac = a[r, c]
+        for c2 in 0..<a.c:
+          a[r, c2] = a[r, c2] - a[result, c2] * fac
+
+    result += 1
+
+proc linearEq*[T](a: Matrix[T], b: openArray[T]): seq[T] =
+  ## 連立一次方程式を解きます。
+  ## 解が存在しない場合は空のseqを返します。
+  var
+    m = newMatrix[float](a.r, a.c + 1)
+
+  for i in 0..<a.r:
+    for j in 0..<a.c:
+      m[i, j] = a[i, j].float
+
+    m[i, a.c] = b[i].float
+
+  let
+    rank = gaussJordan(m)
+    eps = 1e-10
+
+  for r in rank..<a.r:
+    if abs(m[r, a.c]) > eps:
+      return newSeq[T]()
+
+  let
+    isInt = typeof(a[0,0]) is int
+
+  result = newSeqUninitialized[T](a.c)
+  for i in 0..<rank:
+    if isInt:
+      result[i] = m[i, a.c].toInt
+    else:
+      result[i] = m[i, a.c].T
 
 proc `$`*[T](m: Matrix[T]): string =
   var rows = newSeq[string](m.r)
