@@ -1,4 +1,4 @@
-import std/math, sequtils, random, tables
+import std/math, sequtils, random, tables, algorithm
 from ./modint import modpow
 
 randomize()
@@ -83,3 +83,13 @@ proc primeFactorize*(n: Positive): CountTable[int] =
 
   if n != 1:
     result.inc(n)
+
+proc getDivisors*(n: Positive): seq[int] =
+  result = @[]
+  for i in 1..n.float.sqrt.int:
+    if n mod i == 0:
+      result.add i
+      if i * i != n:
+        result.add n div i
+
+  result.sort()
